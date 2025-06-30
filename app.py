@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import nltk
-
+import matplotlib.pyplot as plt
+import seaborn as sns
 # Download VADER
 nltk.download('vader_lexicon')
 
@@ -61,7 +62,7 @@ if uploaded_file:
     st.subheader("📌 Summary by Post")
     st.dataframe(summary.style.background_gradient(cmap='PuBu'))
     
-        # Overall totals
+    # Overall totals
     total_comments = len(df)
     total_posts = df['Post ID'].nunique()
     total_positive = (df['Sentiment'] == 'Positive').sum()
@@ -108,6 +109,47 @@ if uploaded_file:
     </div>
     """, unsafe_allow_html=True)
 
+    
+        # Charts Section
+    st.markdown("---")
+    st.subheader("📊 Visual Sentiment Distribution")
+
+    fig, ax = plt.subplots(figsize=(8, 4))  # slightly small
+    sns.barplot(x=["Positive", "Negative", "Neutral"], 
+                y=[total_positive, total_negative, total_neutral],
+                palette=["#4CAF50", "#F44336", "#FFC107"], ax=ax)
+
+    ax.set_ylabel("Number of Comments")
+    ax.set_title("Overall Sentiment Counts")
+    sns.despine()
+    fig.patch.set_facecolor('#f7f9fc')  # match background
+    fig.tight_layout()
+
+    # Custom border
+    st.markdown("<div style='width:60%;margin:auto;border:2px solid #30475e;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.1);padding:15px;'>", unsafe_allow_html=True)
+    st.pyplot(fig)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # Pie chart
+    st.markdown("### 🥧 Sentiment Composition")
+    fig2, ax2 = plt.subplots(figsize=(6,6))
+    ax2.pie([total_positive, total_negative, total_neutral],
+           labels=["Positive", "Negative", "Neutral"],
+           autopct='%1.1f%%',
+           startangle=140,
+           colors=["#4CAF50", "#F44336", "#FFC107"],
+           wedgeprops={'edgecolor':'white', 'linewidth':2})
+
+    centre_circle = plt.Circle((0,0),0.70,fc='#f7f9fc')
+    fig2.gca().add_artist(centre_circle)
+    ax2.axis('equal')
+    fig2.patch.set_facecolor('#f7f9fc')
+
+    st.markdown("<div style='width:60%;margin:auto;border:2px solid #30475e;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.1);padding:15px;'>", unsafe_allow_html=True)
+    st.pyplot(fig2)
+    st.markdown("</div>", unsafe_allow_html=True)
+    
+    
     # Download
     st.download_button("📥 Download Summary as CSV", summary.to_csv(index=False), "summary.csv", "text/csv")
 
