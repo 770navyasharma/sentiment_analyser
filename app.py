@@ -16,5 +16,4 @@ if uploaded_file:
     df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
     st.success("File uploaded successfully!")
     
-    st.subheader("Raw Data Preview")
-    st.dataframe(df)
+    
