@@ -110,44 +110,87 @@ if uploaded_file:
     """, unsafe_allow_html=True)
 
     
-        # Charts Section
+    # ------------------------
+    # Row 1: Overall Bar + Pie
+    # ------------------------
     st.markdown("---")
-    st.subheader("📊 Visual Sentiment Distribution")
+    st.subheader("📊 Sentiment Overview")
 
-    fig, ax = plt.subplots(figsize=(8, 4))  # slightly small
-    sns.barplot(x=["Positive", "Negative", "Neutral"], 
-                y=[total_positive, total_negative, total_neutral],
-                palette=["#4CAF50", "#F44336", "#FFC107"], ax=ax)
+    col1, col2 = st.columns(2)
 
-    ax.set_ylabel("Number of Comments")
-    ax.set_title("Overall Sentiment Counts")
-    sns.despine()
-    fig.patch.set_facecolor('#f7f9fc')  # match background
-    fig.tight_layout()
+    with col1:
+        fig, ax = plt.subplots(figsize=(5,3))
+        sns.barplot(x=["Positive", "Negative", "Neutral"],
+                    y=[total_positive, total_negative, total_neutral],
+                    palette=["#4CAF50", "#F44336", "#FFC107"], ax=ax)
+        ax.set_ylabel("Number of Comments")
+        ax.set_title("Overall Sentiment Counts")
+        sns.despine()
+        fig.tight_layout()
+        st.pyplot(fig)
 
-    # Custom border
-    st.markdown("<div style='width:60%;margin:auto;border:2px solid #30475e;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.1);padding:15px;'>", unsafe_allow_html=True)
-    st.pyplot(fig)
-    st.markdown("</div>", unsafe_allow_html=True)
+    with col2:
+        fig2, ax2 = plt.subplots(figsize=(5,3))
+        ax2.pie([total_positive, total_negative, total_neutral],
+                labels=["Positive", "Negative", "Neutral"],
+                autopct='%1.1f%%',
+                startangle=140,
+                colors=["#4CAF50", "#F44336", "#FFC107"],
+                wedgeprops={'edgecolor':'white', 'linewidth':2})
+        centre_circle = plt.Circle((0,0),0.70,fc='#f7f9fc')
+        fig2.gca().add_artist(centre_circle)
+        ax2.axis('equal')
+        fig2.tight_layout()
+        st.pyplot(fig2)
 
-    # Pie chart
-    st.markdown("### 🥧 Sentiment Composition")
-    fig2, ax2 = plt.subplots(figsize=(6,6))
-    ax2.pie([total_positive, total_negative, total_neutral],
-           labels=["Positive", "Negative", "Neutral"],
-           autopct='%1.1f%%',
-           startangle=140,
-           colors=["#4CAF50", "#F44336", "#FFC107"],
-           wedgeprops={'edgecolor':'white', 'linewidth':2})
+    # -------------------------------
+    # Row 2: Top / Worst Posts
+    # -------------------------------
+    st.markdown("---")
+    st.subheader("📈 Top & Worst Performing Posts")
 
-    centre_circle = plt.Circle((0,0),0.70,fc='#f7f9fc')
-    fig2.gca().add_artist(centre_circle)
-    ax2.axis('equal')
-    fig2.patch.set_facecolor('#f7f9fc')
+    col3, col4 = st.columns(2)
 
-    st.markdown("<div style='width:60%;margin:auto;border:2px solid #30475e;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.1);padding:15px;'>", unsafe_allow_html=True)
-    st.pyplot(fig2)
-    st.markdown("</div>", unsafe_allow_html=True)
+    with col3:
+        top5_positive = summary.sort_values(by='Positive', ascending=False).head(5)
+        fig3, ax3 = plt.subplots(figsize=(5,3))
+        sns.barplot(data=top5_positive, x='Positive', y='Link', palette="Greens_d", ax=ax3)
+        ax3.set_title("Top 5 Posts by Positive Comments")
+        fig3.tight_layout()
+        st.pyplot(fig3)
+
+    with col4:
+        worst5_positive = summary.sort_values(by='Positive', ascending=True).head(5)
+        fig4, ax4 = plt.subplots(figsize=(5,3))
+        sns.barplot(data=worst5_positive, x='Positive', y='Link', palette="Reds_d", ax=ax4)
+        ax4.set_title("Top 5 Worst Posts by Positive Comments")
+        fig4.tight_layout()
+        st.pyplot(fig4)
+
+    # ------------------------------
+    # Row 3: Top posts by negatives
+    # ------------------------------
+    st.markdown("---")
+    st.subheader("🚨 Posts with Highest Negative Comments")
+
+    col5, col6 = st.columns(2)
+
+    with col5:
+        top5_negative = summary.sort_values(by='Negative', ascending=False).head(5)
+        fig5, ax5 = plt.subplots(figsize=(5,3))
+        sns.barplot(data=top5_negative, x='Negative', y='Link', palette="Oranges_d", ax=ax5)
+        ax5.set_title("Top 5 Posts by Negative Comments")
+        fig5.tight_layout()
+        st.pyplot(fig5)
+
+    with col6:
+        # your creative choice: maybe neutral concentration?
+        top5_neutral = summary.sort_values(by='Neutral', ascending=False).head(5)
+        fig6, ax6 = plt.subplots(figsize=(5,3))
+        sns.barplot(data=top5_neutral, x='Neutral', y='Link', palette="Purples_d", ax=ax6)
+        ax6.set_title("Top 5 Posts by Neutral Comments")
+        fig6.tight_layout()
+        st.pyplot(fig6)
     
     
     # Download
