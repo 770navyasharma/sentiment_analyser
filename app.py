@@ -13,6 +13,7 @@ uploaded_file = st.file_uploader("Choose an Excel file", type=["xlsx"])
 
 if uploaded_file:
     df = pd.read_excel(uploaded_file)
+    df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
     st.success("File uploaded successfully!")
     
     st.subheader("Raw Data Preview")
